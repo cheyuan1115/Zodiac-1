@@ -53,6 +53,16 @@
       margin-top: -1rem;
       margin-bottom: 1.5rem;
     }
+    .recommend-box {
+      background-color: #fff4e6;
+      padding: 1rem;
+      border-left: 4px solid #ff9800;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+    }
+    .recommend-box small {
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -114,7 +124,10 @@
             <h2>${zodiac}</h2>
             <div class="date-info">${new Date().toLocaleDateString()} 今日運勢</div>
             <p><strong>原因與分析：</strong>${data.Quote}</p>
-            <p><strong>推薦香氛：</strong>${data.Recommend || '無資料'}<br><span style="font-size: 0.9rem; color: #666;">可用於提升當日能量狀態的香氛建議。</span></p>
+            <div class="recommend-box">
+              <p style="margin: 0;"><strong>推薦香氛：</strong>${data.Recommend || '無資料'}</p>
+              <small>適合用於今天的能量調整與香氛冥想</small>
+            </div>
           </div>
         `;
       } catch (error) {
