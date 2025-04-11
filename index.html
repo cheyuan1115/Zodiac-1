@@ -1,135 +1,125 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>紫微命盤 × 香氣推薦</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星座香氛推薦</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     body {
-      font-family: 'Noto Serif TC', serif;
-      background: linear-gradient(to bottom right, #e8f5e9, #ffffff);
-      color: #2e4e2e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Noto Sans TC', sans-serif;
+      background: linear-gradient(to bottom, #ffe4e1, #fefefe);
       margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 0.2rem;
+    }
+    h2 {
+      font-size: 1.5rem;
+    }
+    p {
+      line-height: 1.6;
+    }
+    .form {
+      text-align: center;
+      margin-bottom: 2rem;
     }
     .card {
-      background: #ffffff;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 100%;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      max-width: 600px;
+      margin: 1rem auto;
+    }
+    .error {
+      color: red;
       text-align: center;
     }
-    select, input[type="date"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+    .icon {
+      text-align: center;
+      font-size: 4rem;
+      margin-bottom: 1rem;
     }
-    button {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 20px;
-      font-size: 16px;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #388e3c;
-    }
-    .result {
-      margin-top: 30px;
-      text-align: left;
-    }
-    img {
-      max-width: 100%;
-      border-radius: 12px;
-      margin-top: 20px;
+    .date-info {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: -1rem;
+      margin-bottom: 1.5rem;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>紫微命盤 × 香氣推薦</h2>
-    <label for="birth">出生日期：</label>
-    <input type="date" id="birth" required>
-
-    <label for="hour">出生時辰：</label>
-    <select id="hour">
-      <option value="23">子 (23-1)</option>
-      <option value="1">丑 (1-3)</option>
-      <option value="3">寅 (3-5)</option>
-      <option value="5">卯 (5-7)</option>
-      <option value="7">辰 (7-9)</option>
-      <option value="9">巳 (9-11)</option>
-      <option value="11">午 (11-13)</option>
-      <option value="13">未 (13-15)</option>
-      <option value="15">申 (15-17)</option>
-      <option value="17">酉 (17-19)</option>
-      <option value="19">戌 (19-21)</option>
-      <option value="21">亥 (21-23)</option>
-    </select>
-
-    <label for="gender">性別：</label>
-    <select id="gender">
-      <option value="male">男性</option>
-      <option value="female">女性</option>
-    </select>
-
-    <button onclick="generateChart()">產生命盤主星並抽香氣卡</button>
-
-    <div class="result" id="result"></div>
+  <h1>星座香氛推薦</h1>
+  <div class="form">
+    <label>輸入生日：</label>
+    <input type="date" id="birthdate" />
+    <button onclick="getHoroscope()">查看運勢</button>
   </div>
+  <div id="result"></div>
 
   <script>
-    function generateChart() {
-      const birth = document.getElementById('birth').value;
-      const hour = document.getElementById('hour').value;
-      const gender = document.getElementById('gender').value;
+    const zodiacMap = [
+      { sign: '摩羯座', start: '01-01', end: '01-19', icon: '♑' },
+      { sign: '水瓶座', start: '01-20', end: '02-18', icon: '♒' },
+      { sign: '雙魚座', start: '02-19', end: '03-20', icon: '♓' },
+      { sign: '牡羊座', start: '03-21', end: '04-19', icon: '♈' },
+      { sign: '金牛座', start: '04-20', end: '05-20', icon: '♉' },
+      { sign: '雙子座', start: '05-21', end: '06-20', icon: '♊' },
+      { sign: '巨蟹座', start: '06-21', end: '07-22', icon: '♋' },
+      { sign: '獅子座', start: '07-23', end: '08-22', icon: '♌' },
+      { sign: '處女座', start: '08-23', end: '09-22', icon: '♍' },
+      { sign: '天秤座', start: '09-23', end: '10-22', icon: '♎' },
+      { sign: '天蠍座', start: '10-23', end: '11-21', icon: '♏' },
+      { sign: '射手座', start: '11-22', end: '12-21', icon: '♐' },
+      { sign: '摩羯座', start: '12-22', end: '12-31', icon: '♑' },
+    ];
 
-      fetch("https://api.zhenji.tech/api/birth_chart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          gender,
-          year: new Date(birth).getFullYear(),
-          month: new Date(birth).getMonth() + 1,
-          day: new Date(birth).getDate(),
-          hour: parseInt(hour)
-        })
-      })
-      .then(res => res.json())
-      .then(result => {
-        if (!result.ming_gong || !result.ming_gong.main_star) {
-          alert("命盤計算失敗");
+    function getZodiac(month, day) {
+      const mmdd = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      return zodiacMap.find(z => mmdd >= z.start && mmdd <= z.end) || { sign: '未知', icon: '' };
+    }
+
+    async function getHoroscope() {
+      const date = document.getElementById('birthdate').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      if (!date) {
+        resultDiv.innerHTML = '<p class="error">請先輸入生日</p>';
+        return;
+      }
+
+      const [year, month, day] = date.split('-').map(Number);
+      const { sign: zodiac, icon } = getZodiac(month, day);
+
+      try {
+        const res = await axios.get('https://script.google.com/macros/s/AKfycbz_MCZrjkTqdYI1coLdax2YAd4ZPJkOuSHvmbjjCvM90VCcpNpWLMnsO6wbgUfDOfT5hw/exec');
+        const data = res.data.find(item => item.Zodiac === zodiac);
+
+        if (!data) {
+          resultDiv.innerHTML = '<p class="error">找不到對應的星座資料</p>';
           return;
         }
-        const star = result.ming_gong.main_star;
-        fetch("https://script.google.com/macros/s/AKfycbwiZpI9cH_YQIPXpu733EaVnj69LQUM_aSZTWB7f2sdudnocQxD5pNcozd5wHkojYA_LQ/exec?star=" + encodeURIComponent(star))
-          .then(res => res.json())
-          .then(data => {
-            document.getElementById('result').innerHTML = `
-              <h3>命宮主星：${star}</h3>
-              <p><strong>香氣組合：</strong>${data.scent}</p>
-              <p><strong>語錄：</strong>${data.quote}</p>
-              <p><strong>使用建議：</strong>${data.usage}</p>
-              <img src="${data.img}" alt="香氣卡圖像">
-            `;
-          });
-      })
-      .catch(err => {
-        console.error("API 錯誤：", err);
-        alert("命盤產生失敗，請稍後再試。");
-      });
+
+        resultDiv.innerHTML = `
+          <div class="card">
+            <div class="icon">${icon}</div>
+            <h2>${zodiac}</h2>
+            <div class="date-info">${new Date().toLocaleDateString()} 今日運勢</div>
+            <p><strong>原因與分析：</strong>${data.Quote}</p>
+            <p><strong>推薦香氛：</strong>${data.Recommend || '無資料'}<br><span style="font-size: 0.9rem; color: #666;">可用於提升當日能量狀態的香氛建議。</span></p>
+          </div>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = '<p class="error">無法取得資料，請稍後再試。</p>';
+      }
     }
   </script>
 </body>
